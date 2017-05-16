@@ -40,17 +40,18 @@
             this.board.TabIndex = 0;
             this.board.TabStop = false;
             this.board.Paint += new System.Windows.Forms.PaintEventHandler(this.board_Paint);
+            this.board.MouseDown += new System.Windows.Forms.MouseEventHandler(this.board_MouseDown);
             this.board.MouseEnter += new System.EventHandler(this.board_MouseEnter);
             this.board.MouseLeave += new System.EventHandler(this.board_MouseLeave);
             this.board.MouseMove += new System.Windows.Forms.MouseEventHandler(this.board_MouseMove);
             // 
-            // Form1
+            // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(424, 424);
             this.Controls.Add(this.board);
-            this.Name = "Form1";
+            this.Name = "GameForm";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.board)).EndInit();
             this.ResumeLayout(false);

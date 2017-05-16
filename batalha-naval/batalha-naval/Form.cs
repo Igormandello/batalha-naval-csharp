@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,8 @@ namespace batalha_naval
     {
         public const int                   DEFAULT_TILESIZE = 32,
                                            CELL_SIZE        = 40,
-                                           FPS              = 1;
+                                           WATER_CHANGE_FPS = 1,
+                                           SPLASH_FPS       = 4;
 
         public const string                RESOURCES_FOLDER     = "../../../../Resources/";
         public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.mp3", "watersplash2.mp3" };
@@ -25,12 +27,23 @@ namespace batalha_naval
         private bool inside = false, changeWater = true;
         private Point cell  = Point.Empty;
 
+        private Image[,] water;
+
+        private Timer splash;
+
         public GameForm()
         {
             InitializeComponent();
 
+            water = new Image[10, 10];
+            FrameTick(null, new EventArgs());
+
+            splash          = new Timer();
+            splash.Interval = 1000 / SPLASH_FPS;
+            splash.Tick    += SplashTick;
+
             Timer t    = new Timer();
-            t.Interval = 1000 / FPS;
+            t.Interval = 1000 / WATER_CHANGE_FPS;
             t.Tick    += FrameTick;
             t.Start();
         }
@@ -38,28 +51,15 @@ namespace batalha_naval
         Random r = new Random();
         private void board_Paint(object sender, PaintEventArgs e)
         {
-            if (changeWater)
-            {
-                for (int n = 0; n < 10; n++)
-                    for (int i = 0; i < 10; i++)
-                    {
-                        double f = r.NextDouble();
-                        int index;
+            for (int n = 0; n < 10; n++)
+                for (int i = 0; i < 10; i++)
+                {
+                    e.Graphics.DrawImage(water[n,i], new Point(CELL_SIZE * n, CELL_SIZE * i));
+                    System.GC.Collect();
+                }
 
-                        if (f < 0.5)
-                            index = 0;
-                        else if (f < 0.7)
-                            index = 2;
-                        else
-                            index = 1;
-
-
-                        e.Graphics.DrawImage(new Bitmap(WATER_TILE_FRAMES[index], new Size(CELL_SIZE + 1, CELL_SIZE + 1)), new Point(CELL_SIZE * n, CELL_SIZE * i));
-                        System.GC.Collect();
-                    }
-
-                changeWater = false;
-            }
+            if (index >= 0)
+                e.Graphics.DrawImage(new Bitmap(WATER_SPLASH_FRAMES[index], new Size(CELL_SIZE, CELL_SIZE)), splashCell.X * 40, splashCell.Y * 40);
 
             Pen p = new Pen(Color.Black, 2);
             for (int i = 0; i < 10; i++)
@@ -71,14 +71,7 @@ namespace batalha_naval
             if (cell != Point.Empty)
             {
                 p.Color = Color.Aqua;
-
-                int posX = cell.X * CELL_SIZE,
-                    posY = cell.Y * CELL_SIZE;
-
-                e.Graphics.DrawLine(p, posX, posY, posX + CELL_SIZE, posY);
-                e.Graphics.DrawLine(p, posX, posY, posX, posY + CELL_SIZE);
-                e.Graphics.DrawLine(p, posX, posY + CELL_SIZE, posX + CELL_SIZE, posY + CELL_SIZE);
-                e.Graphics.DrawLine(p, posX + CELL_SIZE, posY, posX + CELL_SIZE, posY + CELL_SIZE);
+                e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE, cell.Y * CELL_SIZE), new Size(CELL_SIZE, CELL_SIZE)));
             }
         }
 
@@ -90,6 +83,13 @@ namespace batalha_naval
         private void board_MouseLeave(object sender, EventArgs e)
         {
             inside = false;
+        }
+
+        private void board_MouseDown(object sender, MouseEventArgs e)
+        {
+            splash.Start();
+            splashCell = cell;
+            board.Invalidate();
         }
 
         private void board_MouseMove(object sender, MouseEventArgs e)
@@ -122,7 +122,39 @@ namespace batalha_naval
 
         private void FrameTick(object sender, EventArgs e)
         {
-            changeWater = true;
+            for (int n = 0; n < 10; n++)
+                for (int i = 0; i < 10; i++)
+                {
+                    double f = r.NextDouble();
+                    int index;
+
+                    if (f < 0.5)
+                        index = 0;
+                    else if (f < 0.7)
+                        index = 2;
+                    else
+                        index = 1;
+
+
+                    water[n, i] = new Bitmap(WATER_TILE_FRAMES[index], new Size(CELL_SIZE + 1, CELL_SIZE + 1));
+                }
+
+            board.Invalidate();
+        }
+
+        private int index = -1;
+        private Point splashCell = Point.Empty;
+        private void SplashTick(object sender, EventArgs e)
+        {
+            if (index == WATER_SPLASH_FRAMES.Count - 1)
+            {
+                index = -1;
+                splashCell = Point.Empty;
+                splash.Stop();
+            }
+            else
+                index++;
+
             board.Invalidate();
         }
     }
