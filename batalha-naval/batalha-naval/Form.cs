@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,15 +18,17 @@ namespace batalha_naval
         public const int                   DEFAULT_TILESIZE = 32,
                                            CELL_SIZE        = 40,
                                            WATER_CHANGE_FPS = 1,
-                                           SPLASH_FPS       = 4;
+                                           SPLASH_FPS       = 6;
 
         public const string                RESOURCES_FOLDER     = "../../../../Resources/";
-        public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.mp3", "watersplash2.mp3" };
+        public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.wav", "watersplash2.wav" };
         public static readonly List<Image> WATER_SPLASH_FRAMES  = TileSet.SplitImage(RESOURCES_FOLDER + "splash.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
         public static readonly List<Image> WATER_TILE_FRAMES    = TileSet.SplitImage(RESOURCES_FOLDER + "water_tiles.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
 
-        private bool inside = false, changeWater = true;
-        private Point cell  = Point.Empty;
+        private bool inside = false, shooting = false;
+
+        private Point cell  = Point.Empty, splashCell = Point.Empty;
+        private SoundPlayer player = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASHES_SOUND[0]);
 
         private Image[,] water;
 
@@ -87,9 +90,16 @@ namespace batalha_naval
 
         private void board_MouseDown(object sender, MouseEventArgs e)
         {
-            splash.Start();
-            splashCell = cell;
-            board.Invalidate();
+            if (!shooting)
+            {
+                player.Play();
+
+                splash.Start();
+                splashCell = cell;
+                shooting = true;
+
+                board.Invalidate();
+            }
         }
 
         private void board_MouseMove(object sender, MouseEventArgs e)
@@ -143,13 +153,14 @@ namespace batalha_naval
         }
 
         private int index = -1;
-        private Point splashCell = Point.Empty;
         private void SplashTick(object sender, EventArgs e)
         {
             if (index == WATER_SPLASH_FRAMES.Count - 1)
             {
                 index = -1;
                 splashCell = Point.Empty;
+
+                shooting = false;
                 splash.Stop();
             }
             else
