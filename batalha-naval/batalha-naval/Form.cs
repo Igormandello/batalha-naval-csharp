@@ -55,6 +55,7 @@ namespace batalha_naval
 
 
                         e.Graphics.DrawImage(new Bitmap(WATER_TILE_FRAMES[index], new Size(CELL_SIZE + 1, CELL_SIZE + 1)), new Point(CELL_SIZE * n, CELL_SIZE * i));
+                        System.GC.Collect();
                     }
 
                 changeWater = false;
