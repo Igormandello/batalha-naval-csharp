@@ -10,6 +10,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BatalhaNaval;
 
 namespace batalha_naval
 {
@@ -56,25 +57,24 @@ namespace batalha_naval
         {
             for (int n = 0; n < 10; n++)
                 for (int i = 0; i < 10; i++)
-                {
-                    e.Graphics.DrawImage(water[n,i], new Point(CELL_SIZE * n, CELL_SIZE * i));
-                    System.GC.Collect();
-                }
+                    e.Graphics.DrawImage(water[n,i], new Point(CELL_SIZE * i, CELL_SIZE * n));
 
+            
             if (index >= 0)
-                e.Graphics.DrawImage(new Bitmap(WATER_SPLASH_FRAMES[index], new Size(CELL_SIZE, CELL_SIZE)), splashCell.X * 40, splashCell.Y * 40);
+                using (Bitmap b = new Bitmap(WATER_SPLASH_FRAMES[index], new Size(CELL_SIZE, CELL_SIZE)))
+                    e.Graphics.DrawImage(b, splashCell.X * 40, splashCell.Y * 40);
 
             Pen p = new Pen(Color.Black, 2);
             for (int i = 0; i < 10; i++)
             {
-                e.Graphics.DrawLine(p, 0, CELL_SIZE * i, CELL_SIZE * 10, CELL_SIZE * i);
-                e.Graphics.DrawLine(p, CELL_SIZE * i, 0, CELL_SIZE * i, CELL_SIZE * 10);
+                e.Graphics.DrawLine(p, 0, CELL_SIZE * i + 1, CELL_SIZE * 10, CELL_SIZE * i + 1);
+                e.Graphics.DrawLine(p, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
             }
 
             if (cell != Point.Empty)
             {
                 p.Color = Color.Aqua;
-                e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE, cell.Y * CELL_SIZE), new Size(CELL_SIZE, CELL_SIZE)));
+                e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
             }
         }
 
@@ -114,8 +114,8 @@ namespace batalha_naval
 
                     for (int i = 0; i < 10; i++)
                     {
-                        g.DrawLine(p, 0, CELL_SIZE * i, CELL_SIZE * 10, CELL_SIZE * i);
-                        g.DrawLine(p, CELL_SIZE * i, 0, CELL_SIZE * i, CELL_SIZE * 10);
+                        g.DrawLine(p, 0, CELL_SIZE * i + 1, CELL_SIZE * 10, CELL_SIZE * i + 1);
+                        g.DrawLine(p, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
                     }
 
                     p.Color = Color.Aqua;
@@ -123,10 +123,7 @@ namespace batalha_naval
                     int posX = cell.X * CELL_SIZE,
                         posY = cell.Y * CELL_SIZE;
 
-                    g.DrawLine(p, posX, posY, posX + CELL_SIZE, posY);
-                    g.DrawLine(p, posX, posY, posX, posY + CELL_SIZE);
-                    g.DrawLine(p, posX, posY + CELL_SIZE, posX + CELL_SIZE, posY + CELL_SIZE);
-                    g.DrawLine(p, posX + CELL_SIZE, posY, posX + CELL_SIZE, posY + CELL_SIZE);
+                    g.DrawRectangle(p, new Rectangle(new Point(posX + 1, posY + 1), new Size(CELL_SIZE, CELL_SIZE)));
                 }
         }
 
@@ -145,7 +142,7 @@ namespace batalha_naval
                     else
                         index = 1;
 
-
+                    water[n, i]?.Dispose();
                     water[n, i] = new Bitmap(WATER_TILE_FRAMES[index], new Size(CELL_SIZE + 1, CELL_SIZE + 1));
                 }
 
