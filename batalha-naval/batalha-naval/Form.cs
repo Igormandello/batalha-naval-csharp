@@ -16,6 +16,7 @@ namespace batalha_naval
 {
     public partial class GameForm : Form
     {
+        #region Variaveis e constantes dos graficos e sons
         public const int                   DEFAULT_TILESIZE = 32,
                                            CELL_SIZE        = 40,
                                            WATER_CHANGE_FPS = 1,
@@ -34,10 +35,22 @@ namespace batalha_naval
         private Image[,] water;
 
         private Timer splash;
+        #endregion
+
+        private bool inGame = false;
+        private String userName;
+        private ClienteP2P usuario;
+        private Tabuleiro tabUser;
 
         public GameForm()
         {
             InitializeComponent();
+
+            UserForm user = new UserForm();
+            if (user.ShowDialog(this) == DialogResult.OK)
+                userName = user.User;
+            else
+                this.Dispose();
 
             water = new Image[10, 10];
             FrameTick(null, new EventArgs());
@@ -90,16 +103,17 @@ namespace batalha_naval
 
         private void board_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!shooting)
-            {
-                player.Play();
+            if (inGame)
+                if (!shooting)
+                {
+                    player.Play();
 
-                splash.Start();
-                splashCell = cell;
-                shooting = true;
+                    splash.Start();
+                    splashCell = cell;
+                    shooting = true;
 
-                board.Invalidate();
-            }
+                    board.Invalidate();
+                }
         }
 
         private void board_MouseMove(object sender, MouseEventArgs e)

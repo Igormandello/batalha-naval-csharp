@@ -16,7 +16,11 @@ namespace batalha_naval
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GameForm());
+            try
+            {
+                Application.Run(new GameForm());
+            }
+            catch { }
         }
     }
 }
