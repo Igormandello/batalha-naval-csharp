@@ -27,10 +27,11 @@ namespace batalha_naval
         public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.wav", "watersplash2.wav" };
         public static readonly List<Image> WATER_SPLASH_FRAMES  = TileSet.SplitImage(RESOURCES_FOLDER + "splash.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
         public static readonly List<Image> WATER_TILE_FRAMES    = TileSet.SplitImage(RESOURCES_FOLDER + "water_tiles.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
+        public static readonly Point EMPTY_POINT                = new Point(-1, -1);
 
         private bool inside = false, shooting = false;
 
-        private Point cell  = Point.Empty, splashCell = Point.Empty;
+        private Point cell  = EMPTY_POINT, splashCell = EMPTY_POINT;
         private SoundPlayer player = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASHES_SOUND[0]);
 
         private Image[,] water;
@@ -38,6 +39,10 @@ namespace batalha_naval
         private Timer splash;
         #endregion
 
+        private Dictionary<Navio, int> disponiveis = new Dictionary<Navio, int>();
+        private List<BoatData> barcosMapa = new List<BoatData>();
+
+        private PictureBox inicioArraste = null;
         private DragData arraste = default(DragData);
         private System.Threading.Thread checkKey;
 
@@ -45,6 +50,8 @@ namespace batalha_naval
         private String userName;
         private ClienteP2P usuario;
         private Tabuleiro tabUser;
+
+        private Navio draggedBoat = Navio.Cruzador;
 
         public GameForm()
         {
@@ -55,6 +62,13 @@ namespace batalha_naval
             //   userName = user.User;
             //else
             //    this.Dispose();
+
+            tabUser = new Tabuleiro();
+            disponiveis.Add(Navio.PortaAvioes, Navio.PortaAvioes.Limite());
+            disponiveis.Add(Navio.Encouracado, Navio.Encouracado.Limite());
+            disponiveis.Add(Navio.Cruzador, Navio.Cruzador.Limite());
+            disponiveis.Add(Navio.Destroier, Navio.Destroier.Limite());
+            disponiveis.Add(Navio.Submarino, Navio.Submarino.Limite());
 
             checkKey = new System.Threading.Thread(new System.Threading.ThreadStart(run));
             checkKey.SetApartmentState(System.Threading.ApartmentState.STA);
@@ -91,14 +105,15 @@ namespace batalha_naval
                 e.Graphics.DrawLine(p, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
             }
 
+            //Se o usuário está arrastando alguma coisa, desenha o barco e se a posição é válida
             if (!arraste.Equals(default(DragData)))
             {
-                e.Graphics.DrawImage(new Bitmap(arraste.Image, 
-                                               (arraste.SentidoBarco == Sentido.Horizontal ? new Size(CELL_SIZE * arraste.Size, CELL_SIZE) : new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), 
+                e.Graphics.DrawImage(new Bitmap(arraste.Image,
+                                               (arraste.SentidoBarco == Sentido.Horizontal ? new Size(CELL_SIZE * arraste.Size, CELL_SIZE) : new Size(CELL_SIZE, CELL_SIZE * arraste.Size))),
                                      cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1);
 
                 Brush b = new Pen(Color.FromArgb(100, Color.Green)).Brush;
-                Rectangle validateRect = new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), 
+                Rectangle validateRect = new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1),
                                          (arraste.SentidoBarco == Sentido.Horizontal ?
                                          new Size(CELL_SIZE * arraste.Size, CELL_SIZE) :
                                          new Size(CELL_SIZE, CELL_SIZE * arraste.Size)));
@@ -108,15 +123,23 @@ namespace batalha_naval
 
                 e.Graphics.FillRectangle(b, validateRect);
             }
-            else if (cell != Point.Empty)
+            //Caso contrário, contorna a célula que o usuário está passando com o mouse
+            else
             {
-                p.Color = Color.Aqua;
-                e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
+                if (cell != EMPTY_POINT)
+                {
+                    p.Color = Color.Aqua;
+                    e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
+                }
             }
+
+            foreach (BoatData bd in barcosMapa)
+                e.Graphics.DrawImage(bd.Image, bd.Point);
         }
 
         private void board_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+            //Caso esteja em um jogo e no momento o tiro não esta sendo disparado, começa a tocar um novo som de tiro
             if (inGame)
                 if (!shooting)
                 {
@@ -132,26 +155,12 @@ namespace batalha_naval
 
         private void MouseMove(Point p)
         {
+            //Caso a posição do mouse tenha mudado, ele troca a celula atual e redesenha
             if (inside || !arraste.Equals(default(DragData)))
                 if (p.X / CELL_SIZE != cell.X || p.Y / CELL_SIZE != cell.Y)
                 {
                     cell = new Point(p.X / CELL_SIZE, p.Y / CELL_SIZE);
-
-                    Pen p2 = new Pen(Color.Black, 2);
-                    Graphics g = board.CreateGraphics();
-
-                    for (int i = 0; i < 10; i++)
-                    {
-                        g.DrawLine(p2, 0, CELL_SIZE * i + 1, CELL_SIZE * 10, CELL_SIZE * i + 1);
-                        g.DrawLine(p2, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
-                    }
-
-                    p2.Color = Color.Aqua;
-
-                    int posX = cell.X * CELL_SIZE,
-                        posY = cell.Y * CELL_SIZE;
-
-                    g.DrawRectangle(p2, new Rectangle(new Point(posX + 1, posY + 1), new Size(CELL_SIZE, CELL_SIZE)));
+                    board.Invalidate();
                 }
         }
 
@@ -162,6 +171,7 @@ namespace batalha_naval
 
             while (true)
             {
+                //Troca o sentido do barco sendo arrastado cada vez que o usuário pressiona enter
                 if (!pressed && Keyboard.IsKeyDown(Key.Enter))
                 {
                     if (Keyboard.IsKeyDown(Key.Enter) && !arraste.Equals(default(DragData)))
@@ -193,11 +203,35 @@ namespace batalha_naval
             inside = false;
         }
 
-        private void barco_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        private void ArrasteBarco(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if (barco.Image != null)
+            if (((PictureBox)sender).Image != null)
             {
-                arraste = new DragData(Navio.Cruzador, Sentido.Horizontal);
+                switch(((PictureBox)sender).Name.Substring(2))
+                {
+                    case "PortaAvioes":
+                        draggedBoat = Navio.PortaAvioes;
+                        break;
+
+                    case "Encouracado":
+                        draggedBoat = Navio.Encouracado;
+                        break;
+
+                    case "Cruzador":
+                        draggedBoat = Navio.Cruzador;
+                        break;
+
+                    case "Destroier":
+                        draggedBoat = Navio.Destroier;
+                        break;
+
+                    case "Submarino":
+                        draggedBoat = Navio.Submarino;
+                        break;
+                }
+
+                //Se há uma imagem, ainda existem barcos para serem arrastados, então ele inicia um novo arraste
+                arraste = new DragData(draggedBoat, Sentido.Horizontal, sender);
                 board.DoDragDrop(arraste.Image, DragDropEffects.Copy);
             }
         }
@@ -206,13 +240,19 @@ namespace batalha_naval
         {
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
             {
+                //Para a verificação do usuário tentando girar o navio
                 if (checkKey.ThreadState == System.Threading.ThreadState.Unstarted)
                     checkKey.Start();
                 else
                     checkKey.Resume();
 
-                arraste = new DragData(Navio.Cruzador, Sentido.Horizontal);
-                barco.Image = null;
+                //Inicia o novo arraste, guardando o barco que esta sendo arrastado e removendo da garagem
+                arraste = new DragData(draggedBoat, Sentido.Horizontal, arraste.Sender);
+                disponiveis[arraste.Navio]--;
+
+                if (disponiveis[arraste.Navio] == 0)
+                    ((PictureBox)arraste.Sender).Image = null;
+
                 e.Effect = DragDropEffects.Copy;
             }
             else
@@ -223,8 +263,26 @@ namespace batalha_naval
         {
             checkKey.Suspend();
 
-            barco.Image = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
-            arraste = default(DragData);
+            try
+            {
+                //Posiciona o navio no tabuleiro para o multiplayer
+                tabUser.PosicionarNavio(arraste.Navio, cell.X, cell.Y, (int)arraste.SentidoBarco);
+
+                //Guarda os barcos ja adicionados para serem redesenhados
+                barcosMapa.Add(new BoatData(new Bitmap(arraste.Image,
+                                                      (arraste.SentidoBarco == Sentido.Horizontal ? 
+                                                      new Size(CELL_SIZE * arraste.Size, CELL_SIZE) : 
+                                                      new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1)));
+
+                arraste = default(DragData);
+            }
+            catch
+            {
+                //Caso a adição do barco não foi sucedida, o barco volta para a garagem e aumenta um em disponíveis
+                disponiveis[arraste.Navio]++;
+                ((PictureBox)arraste.Sender).Image = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
+                arraste = default(DragData);
+            }
 
             board.Invalidate();
         }
@@ -233,7 +291,10 @@ namespace batalha_naval
         {
             checkKey.Suspend();
 
-            barco.Image = arraste.Image;
+            //Retorna todas as informações, como se o drag não tivesse iniciado, para evitar que, caso o usuário 
+            //tenha solto o drag fora do tabuleiro, ele continue guardando as informações e acabe perdendo um barco
+            ((PictureBox)arraste.Sender).Image = arraste.Image;
+            disponiveis[arraste.Navio]++;
             arraste = default(DragData);
 
             board.Invalidate();

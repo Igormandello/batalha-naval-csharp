@@ -10,6 +10,7 @@ namespace batalha_naval
     public struct DragData
     {
         public System.Drawing.Image Image { get; private set; }
+        public Navio Navio { get; private set; }
         public int Size { get; private set; }
 
         private Sentido _sentido;
@@ -31,16 +32,35 @@ namespace batalha_naval
                 this._sentido = value;
             }
         }
+        public object Sender { get; private set; }
 
-        public DragData(Navio n, Sentido s)
+        public DragData(Navio n, Sentido s, object sender)
         {
+            Navio = n;
+            Size  = n.Tamanho();
+            this._sentido = Sentido.Horizontal;
+            this.Sender   = sender;
+
             switch (n)
             {
+                case Navio.PortaAvioes:
+                    Image = batalha_naval.Properties.Resources.PortaAvioes;
+                    break;
+
+                case Navio.Encouracado:
+                    Image = batalha_naval.Properties.Resources.Encouracado;
+                    break;
+
                 case Navio.Cruzador:
-                    Size = 5;
-                    Image = ((System.Drawing.Image)(new System.ComponentModel.ComponentResourceManager(typeof(GameForm)).GetObject("barco.Image")));
-                    this._sentido = Sentido.Horizontal;
-                    SentidoBarco = s;
+                    Image = batalha_naval.Properties.Resources.Cruzador;
+                    break;
+
+                case Navio.Destroier:
+                    Image = batalha_naval.Properties.Resources.Destroier;
+                    break;
+
+                case Navio.Submarino:
+                    Image = batalha_naval.Properties.Resources.Submarino;
                     break;
 
                 default:
@@ -49,8 +69,10 @@ namespace batalha_naval
                     this._sentido = Sentido.Horizontal;
                     break;
             }
+
+            SentidoBarco = s;
         }
     }
 
-    public enum Sentido { Vertical, Horizontal }
+    public enum Sentido { Vertical = 0, Horizontal = 3 }
 }

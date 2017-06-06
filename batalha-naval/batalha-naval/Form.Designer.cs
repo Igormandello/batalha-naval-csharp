@@ -28,11 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameForm));
             this.board = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.gbCaragem = new System.Windows.Forms.GroupBox();
-            this.barco = new System.Windows.Forms.PictureBox();
+            this.pbSubmarino = new System.Windows.Forms.PictureBox();
+            this.pbDestroier = new System.Windows.Forms.PictureBox();
+            this.pbCruzador = new System.Windows.Forms.PictureBox();
+            this.pbEncouracado = new System.Windows.Forms.PictureBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.pbPortaAvioes = new System.Windows.Forms.PictureBox();
             this.pnlConexao = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -40,7 +49,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.board)).BeginInit();
             this.panel1.SuspendLayout();
             this.gbCaragem.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.barco)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSubmarino)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDestroier)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).BeginInit();
             this.pnlConexao.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,23 +86,135 @@
             // 
             // gbCaragem
             // 
-            this.gbCaragem.Controls.Add(this.barco);
-            this.gbCaragem.Location = new System.Drawing.Point(3, 6);
+            this.gbCaragem.Controls.Add(this.pbSubmarino);
+            this.gbCaragem.Controls.Add(this.pbDestroier);
+            this.gbCaragem.Controls.Add(this.pbCruzador);
+            this.gbCaragem.Controls.Add(this.pbEncouracado);
+            this.gbCaragem.Controls.Add(this.label7);
+            this.gbCaragem.Controls.Add(this.label6);
+            this.gbCaragem.Controls.Add(this.label5);
+            this.gbCaragem.Controls.Add(this.label4);
+            this.gbCaragem.Controls.Add(this.label3);
+            this.gbCaragem.Controls.Add(this.label2);
+            this.gbCaragem.Controls.Add(this.pbPortaAvioes);
+            this.gbCaragem.Location = new System.Drawing.Point(3, 0);
             this.gbCaragem.Name = "gbCaragem";
-            this.gbCaragem.Size = new System.Drawing.Size(234, 391);
+            this.gbCaragem.Size = new System.Drawing.Size(234, 397);
             this.gbCaragem.TabIndex = 3;
             this.gbCaragem.TabStop = false;
             this.gbCaragem.Text = "Garagem";
             // 
-            // barco
+            // pbSubmarino
             // 
-            this.barco.Image = ((System.Drawing.Image)(resources.GetObject("barco.Image")));
-            this.barco.Location = new System.Drawing.Point(7, 22);
-            this.barco.Name = "barco";
-            this.barco.Size = new System.Drawing.Size(221, 70);
-            this.barco.TabIndex = 0;
-            this.barco.TabStop = false;
-            this.barco.MouseDown += new System.Windows.Forms.MouseEventHandler(this.barco_MouseDown);
+            this.pbSubmarino.Image = global::batalha_naval.Properties.Resources.Submarino;
+            this.pbSubmarino.Location = new System.Drawing.Point(9, 325);
+            this.pbSubmarino.Name = "pbSubmarino";
+            this.pbSubmarino.Size = new System.Drawing.Size(40, 40);
+            this.pbSubmarino.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbSubmarino.TabIndex = 10;
+            this.pbSubmarino.TabStop = false;
+            this.pbSubmarino.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
+            // 
+            // pbDestroier
+            // 
+            this.pbDestroier.Image = global::batalha_naval.Properties.Resources.Destroier;
+            this.pbDestroier.Location = new System.Drawing.Point(9, 254);
+            this.pbDestroier.Name = "pbDestroier";
+            this.pbDestroier.Size = new System.Drawing.Size(80, 40);
+            this.pbDestroier.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbDestroier.TabIndex = 9;
+            this.pbDestroier.TabStop = false;
+            this.pbDestroier.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
+            // 
+            // pbCruzador
+            // 
+            this.pbCruzador.Image = global::batalha_naval.Properties.Resources.Cruzador;
+            this.pbCruzador.Location = new System.Drawing.Point(9, 183);
+            this.pbCruzador.Name = "pbCruzador";
+            this.pbCruzador.Size = new System.Drawing.Size(120, 40);
+            this.pbCruzador.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbCruzador.TabIndex = 8;
+            this.pbCruzador.TabStop = false;
+            this.pbCruzador.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
+            // 
+            // pbEncouracado
+            // 
+            this.pbEncouracado.Image = global::batalha_naval.Properties.Resources.Encouracado;
+            this.pbEncouracado.Location = new System.Drawing.Point(9, 112);
+            this.pbEncouracado.Name = "pbEncouracado";
+            this.pbEncouracado.Size = new System.Drawing.Size(160, 40);
+            this.pbEncouracado.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbEncouracado.TabIndex = 7;
+            this.pbEncouracado.TabStop = false;
+            this.pbEncouracado.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 309);
+            this.label7.Margin = new System.Windows.Forms.Padding(3, 12, 3, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(57, 13);
+            this.label7.TabIndex = 6;
+            this.label7.Text = "Submarino";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 238);
+            this.label6.Margin = new System.Windows.Forms.Padding(3, 12, 3, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(49, 13);
+            this.label6.TabIndex = 5;
+            this.label6.Text = "Destroier";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 167);
+            this.label5.Margin = new System.Windows.Forms.Padding(3, 12, 3, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(49, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "Cruzador";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 96);
+            this.label4.Margin = new System.Windows.Forms.Padding(3, 12, 3, 0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(71, 13);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "Encouraçado";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(67, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Porta-Aviões";
+            // 
+            // label2
+            // 
+            this.label2.Location = new System.Drawing.Point(98, 362);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(130, 32);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Pressione Enter enquanto arrasta para virar o barco!";
+            // 
+            // pbPortaAvioes
+            // 
+            this.pbPortaAvioes.Image = global::batalha_naval.Properties.Resources.PortaAvioes;
+            this.pbPortaAvioes.Location = new System.Drawing.Point(9, 41);
+            this.pbPortaAvioes.Name = "pbPortaAvioes";
+            this.pbPortaAvioes.Size = new System.Drawing.Size(200, 40);
+            this.pbPortaAvioes.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbPortaAvioes.TabIndex = 0;
+            this.pbPortaAvioes.TabStop = false;
+            this.pbPortaAvioes.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
             // 
             // pnlConexao
             // 
@@ -140,7 +265,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.board)).EndInit();
             this.panel1.ResumeLayout(false);
             this.gbCaragem.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.barco)).EndInit();
+            this.gbCaragem.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSubmarino)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbDestroier)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).EndInit();
             this.pnlConexao.ResumeLayout(false);
             this.pnlConexao.PerformLayout();
             this.ResumeLayout(false);
@@ -156,7 +286,17 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Panel pnlConexao;
-        private System.Windows.Forms.PictureBox barco;
+        private System.Windows.Forms.PictureBox pbPortaAvioes;
+        private System.Windows.Forms.PictureBox pbSubmarino;
+        private System.Windows.Forms.PictureBox pbDestroier;
+        private System.Windows.Forms.PictureBox pbCruzador;
+        private System.Windows.Forms.PictureBox pbEncouracado;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
     }
 }
 

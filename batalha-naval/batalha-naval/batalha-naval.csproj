@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoatData.cs" />
     <Compile Include="DragData.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
@@ -75,6 +76,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="UserForm.resx">
       <DependentUpon>UserForm.cs</DependentUpon>
@@ -97,6 +99,21 @@
       <Project>{5ca5fc67-8e8b-47f9-b2bd-04eafa570c28}</Project>
       <Name>Protocolo</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PortaAvioes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cruzador.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Destroier.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Submarino.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Encouracado.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
