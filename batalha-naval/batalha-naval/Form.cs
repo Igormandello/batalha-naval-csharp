@@ -10,6 +10,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 using BatalhaNaval;
 
 namespace batalha_naval
@@ -37,6 +38,9 @@ namespace batalha_naval
         private Timer splash;
         #endregion
 
+        private DragData arraste = default(DragData);
+        private System.Threading.Thread checkKey;
+
         private bool inGame = false;
         private String userName;
         private ClienteP2P usuario;
@@ -46,11 +50,14 @@ namespace batalha_naval
         {
             InitializeComponent();
 
-            UserForm user = new UserForm();
-            if (user.ShowDialog(this) == DialogResult.OK)
-                userName = user.User;
-            else
-                this.Dispose();
+            //UserForm user = new UserForm();
+            //if (user.ShowDialog(this) == DialogResult.OK)
+            //   userName = user.User;
+            //else
+            //    this.Dispose();
+
+            checkKey = new System.Threading.Thread(new System.Threading.ThreadStart(run));
+            checkKey.SetApartmentState(System.Threading.ApartmentState.STA);
 
             water = new Image[10, 10];
             FrameTick(null, new EventArgs());
@@ -84,24 +91,31 @@ namespace batalha_naval
                 e.Graphics.DrawLine(p, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
             }
 
-            if (cell != Point.Empty)
+            if (!arraste.Equals(default(DragData)))
+            {
+                e.Graphics.DrawImage(new Bitmap(arraste.Image, 
+                                               (arraste.SentidoBarco == Sentido.Horizontal ? new Size(CELL_SIZE * arraste.Size, CELL_SIZE) : new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), 
+                                     cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1);
+
+                Brush b = new Pen(Color.FromArgb(100, Color.Green)).Brush;
+                Rectangle validateRect = new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), 
+                                         (arraste.SentidoBarco == Sentido.Horizontal ?
+                                         new Size(CELL_SIZE * arraste.Size, CELL_SIZE) :
+                                         new Size(CELL_SIZE, CELL_SIZE * arraste.Size)));
+
+                if ((cell.X + arraste.Size > 10 && arraste.SentidoBarco == Sentido.Horizontal) || (cell.Y + arraste.Size > 10 && arraste.SentidoBarco == Sentido.Vertical))
+                    b = new Pen(Color.FromArgb(100, Color.Red)).Brush;
+
+                e.Graphics.FillRectangle(b, validateRect);
+            }
+            else if (cell != Point.Empty)
             {
                 p.Color = Color.Aqua;
                 e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
             }
         }
 
-        private void board_MouseEnter(object sender, EventArgs e)
-        {
-            inside = true;
-        }
-
-        private void board_MouseLeave(object sender, EventArgs e)
-        {
-            inside = false;
-        }
-
-        private void board_MouseDown(object sender, MouseEventArgs e)
+        private void board_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (inGame)
                 if (!shooting)
@@ -116,31 +130,123 @@ namespace batalha_naval
                 }
         }
 
-        private void board_MouseMove(object sender, MouseEventArgs e)
+        private void MouseMove(Point p)
         {
-            if (inside)
-                if (e.X / CELL_SIZE != cell.X || e.Y / CELL_SIZE != cell.Y)
+            if (inside || !arraste.Equals(default(DragData)))
+                if (p.X / CELL_SIZE != cell.X || p.Y / CELL_SIZE != cell.Y)
                 {
-                    cell = new Point(e.X / CELL_SIZE, e.Y / CELL_SIZE);
+                    cell = new Point(p.X / CELL_SIZE, p.Y / CELL_SIZE);
 
-                    Pen p = new Pen(Color.Black, 2);
+                    Pen p2 = new Pen(Color.Black, 2);
                     Graphics g = board.CreateGraphics();
 
                     for (int i = 0; i < 10; i++)
                     {
-                        g.DrawLine(p, 0, CELL_SIZE * i + 1, CELL_SIZE * 10, CELL_SIZE * i + 1);
-                        g.DrawLine(p, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
+                        g.DrawLine(p2, 0, CELL_SIZE * i + 1, CELL_SIZE * 10, CELL_SIZE * i + 1);
+                        g.DrawLine(p2, CELL_SIZE * i + 1, 0, CELL_SIZE * i + 1, CELL_SIZE * 10);
                     }
 
-                    p.Color = Color.Aqua;
+                    p2.Color = Color.Aqua;
 
                     int posX = cell.X * CELL_SIZE,
                         posY = cell.Y * CELL_SIZE;
 
-                    g.DrawRectangle(p, new Rectangle(new Point(posX + 1, posY + 1), new Size(CELL_SIZE, CELL_SIZE)));
+                    g.DrawRectangle(p2, new Rectangle(new Point(posX + 1, posY + 1), new Size(CELL_SIZE, CELL_SIZE)));
                 }
         }
 
+        #region Drag Boat Methods
+        private void run()
+        {
+            bool pressed = false;
+
+            while (true)
+            {
+                if (!pressed && Keyboard.IsKeyDown(Key.Enter))
+                {
+                    if (Keyboard.IsKeyDown(Key.Enter) && !arraste.Equals(default(DragData)))
+                        if (arraste.SentidoBarco == Sentido.Horizontal)
+                            arraste.SentidoBarco = Sentido.Vertical;
+                        else
+                            arraste.SentidoBarco = Sentido.Horizontal;
+
+                    pressed = true;
+                }
+                else if (Keyboard.IsKeyUp(Key.Enter))
+                    pressed = false;
+
+            }
+        }
+
+        private void board_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            MouseMove(new Point(e.X, e.Y));
+        }
+
+        private void board_MouseEnter(object sender, EventArgs e)
+        {
+            inside = true;
+        }
+
+        private void board_MouseLeave(object sender, EventArgs e)
+        {
+            inside = false;
+        }
+
+        private void barco_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (barco.Image != null)
+            {
+                arraste = new DragData(Navio.Cruzador, Sentido.Horizontal);
+                board.DoDragDrop(arraste.Image, DragDropEffects.Copy);
+            }
+        }
+
+        private void board_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Bitmap))
+            {
+                if (checkKey.ThreadState == System.Threading.ThreadState.Unstarted)
+                    checkKey.Start();
+                else
+                    checkKey.Resume();
+
+                arraste = new DragData(Navio.Cruzador, Sentido.Horizontal);
+                barco.Image = null;
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void board_DragDrop(object sender, DragEventArgs e)
+        {
+            checkKey.Suspend();
+
+            barco.Image = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
+            arraste = default(DragData);
+
+            board.Invalidate();
+        }
+
+        private void board_DragLeave(object sender, EventArgs e)
+        {
+            checkKey.Suspend();
+
+            barco.Image = arraste.Image;
+            arraste = default(DragData);
+
+            board.Invalidate();
+        }
+
+        private void board_DragOver(object sender, DragEventArgs e)
+        {
+            MouseMove(board.PointToClient(new Point(e.X, e.Y)));
+            board.Invalidate();
+        }
+        #endregion
+
+        #region Frames Methods
         private void FrameTick(object sender, EventArgs e)
         {
             for (int n = 0; n < 10; n++)
@@ -156,7 +262,8 @@ namespace batalha_naval
                     else
                         index = 1;
 
-                    water[n, i]?.Dispose();
+                    if (water[n, i] != null)
+                        water[n, i].Dispose();
                     water[n, i] = new Bitmap(WATER_TILE_FRAMES[index], new Size(CELL_SIZE + 1, CELL_SIZE + 1));
                 }
 
@@ -179,5 +286,6 @@ namespace batalha_naval
 
             board.Invalidate();
         }
+        #endregion
     }
 }
