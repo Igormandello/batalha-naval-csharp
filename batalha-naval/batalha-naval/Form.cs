@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 using BatalhaNaval;
+using System.Threading;
 
 namespace batalha_naval
 {
@@ -36,22 +37,22 @@ namespace batalha_naval
 
         private Image[,] water;
 
-        private Timer splash;
+        private System.Windows.Forms.Timer splash;
         #endregion
 
-        private Dictionary<Navio, int> disponiveis = new Dictionary<Navio, int>();
+        private Dictionary<TipoDeNavio, int> disponiveis = new Dictionary<TipoDeNavio, int>();
         private List<BoatData> barcosMapa = new List<BoatData>();
 
-        private PictureBox inicioArraste = null;
         private DragData arraste = default(DragData);
-        private System.Threading.Thread checkKey;
+        private Semaphore keyChecker; 
+        private Thread checkKey;
 
-        private bool inGame = false;
+        private bool inGame = false, stopRunning = false;
         private String userName;
         private ClienteP2P usuario;
         private Tabuleiro tabUser;
 
-        private Navio draggedBoat = Navio.Cruzador;
+        private TipoDeNavio draggedBoat;
 
         public GameForm()
         {
@@ -63,27 +64,44 @@ namespace batalha_naval
             //else
             //    this.Dispose();
 
+            keyChecker = new Semaphore(0, 2);
+            keyChecker.Release();
+
             tabUser = new Tabuleiro();
-            disponiveis.Add(Navio.PortaAvioes, Navio.PortaAvioes.Limite());
-            disponiveis.Add(Navio.Encouracado, Navio.Encouracado.Limite());
-            disponiveis.Add(Navio.Cruzador, Navio.Cruzador.Limite());
-            disponiveis.Add(Navio.Destroier, Navio.Destroier.Limite());
-            disponiveis.Add(Navio.Submarino, Navio.Submarino.Limite());
+            disponiveis.Add(TipoDeNavio.PortaAvioes, TipoDeNavio.PortaAvioes.Limite());
+            disponiveis.Add(TipoDeNavio.Encouracado, TipoDeNavio.Encouracado.Limite());
+            disponiveis.Add(TipoDeNavio.Cruzador, TipoDeNavio.Cruzador.Limite());
+            disponiveis.Add(TipoDeNavio.Destroier, TipoDeNavio.Destroier.Limite());
+            disponiveis.Add(TipoDeNavio.Submarino, TipoDeNavio.Submarino.Limite());
 
             checkKey = new System.Threading.Thread(new System.Threading.ThreadStart(run));
             checkKey.SetApartmentState(System.Threading.ApartmentState.STA);
+            checkKey.Start();
 
             water = new Image[10, 10];
             FrameTick(null, new EventArgs());
 
-            splash          = new Timer();
+            splash          = new System.Windows.Forms.Timer();
             splash.Interval = 1000 / SPLASH_FPS;
             splash.Tick    += SplashTick;
 
-            Timer t    = new Timer();
+            var t      = new System.Windows.Forms.Timer();
             t.Interval = 1000 / WATER_CHANGE_FPS;
             t.Tick    += FrameTick;
             t.Start();
+        }
+
+        private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            stopRunning = true;
+
+            try
+            {
+                keyChecker.Release();
+            }
+            catch { }
+
+            keyChecker.Dispose();
         }
 
         Random r = new Random();
@@ -164,6 +182,33 @@ namespace batalha_naval
                 }
         }
 
+        #region Conection Methods
+        private void IniciarCliente()
+        {
+            usuario = new ClienteP2P("Igor", tabUser);
+            usuario.OnClienteDisponivel += ClienteDisponivel;
+            usuario.OnClienteRequisitandoConexao += RequisitandoConexao;
+
+            usuario.Iniciar();
+
+            gbGaragem.Visible = false;
+            pnlConexao.Visible = true;
+        }
+
+        private bool RequisitandoConexao(System.Net.IPAddress addr)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ClienteDisponivel(System.Net.IPAddress addr)
+        {
+            if (InvokeRequired)
+                Invoke(new Action(() => { ClienteDisponivel(addr); }));
+            else if (!cbIPs.Items.Contains(addr))
+                cbIPs.Items.Add(addr);
+        }
+        #endregion
+
         #region Drag Boat Methods
         private void run()
         {
@@ -171,6 +216,8 @@ namespace batalha_naval
 
             while (true)
             {
+                keyChecker.WaitOne();
+
                 //Troca o sentido do barco sendo arrastado cada vez que o usuário pressiona enter
                 if (!pressed && Keyboard.IsKeyDown(Key.Enter))
                 {
@@ -185,6 +232,10 @@ namespace batalha_naval
                 else if (Keyboard.IsKeyUp(Key.Enter))
                     pressed = false;
 
+                if (!stopRunning)
+                    keyChecker.Release();
+                else
+                    checkKey.Abort();
             }
         }
 
@@ -210,23 +261,23 @@ namespace batalha_naval
                 switch(((PictureBox)sender).Name.Substring(2))
                 {
                     case "PortaAvioes":
-                        draggedBoat = Navio.PortaAvioes;
+                        draggedBoat = TipoDeNavio.PortaAvioes;
                         break;
 
                     case "Encouracado":
-                        draggedBoat = Navio.Encouracado;
+                        draggedBoat = TipoDeNavio.Encouracado;
                         break;
 
                     case "Cruzador":
-                        draggedBoat = Navio.Cruzador;
+                        draggedBoat = TipoDeNavio.Cruzador;
                         break;
 
                     case "Destroier":
-                        draggedBoat = Navio.Destroier;
+                        draggedBoat = TipoDeNavio.Destroier;
                         break;
 
                     case "Submarino":
-                        draggedBoat = Navio.Submarino;
+                        draggedBoat = TipoDeNavio.Submarino;
                         break;
                 }
 
@@ -238,13 +289,20 @@ namespace batalha_naval
 
         private void board_DragEnter(object sender, DragEventArgs e)
         {
+            inside = true;
+
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
             {
                 //Para a verificação do usuário tentando girar o navio
-                if (checkKey.ThreadState == System.Threading.ThreadState.Unstarted)
-                    checkKey.Start();
-                else
-                    checkKey.Resume();
+                //if (checkkey.threadstate == system.threading.threadstate.unstarted)
+                //    checkkey.start();
+                //else
+                //    checkkey.resume();
+                try
+                {
+                    keyChecker.Release();
+                }
+                catch { }
 
                 //Inicia o novo arraste, guardando o barco que esta sendo arrastado e removendo da garagem
                 arraste = new DragData(draggedBoat, Sentido.Horizontal, arraste.Sender);
@@ -261,20 +319,22 @@ namespace batalha_naval
 
         private void board_DragDrop(object sender, DragEventArgs e)
         {
-            checkKey.Suspend();
-
             try
             {
+                keyChecker.WaitOne();
+
                 //Posiciona o navio no tabuleiro para o multiplayer
-                tabUser.PosicionarNavio(arraste.Navio, cell.X, cell.Y, (int)arraste.SentidoBarco);
+                tabUser.PosicionarNavio(arraste.Navio, cell.X, cell.Y, (Direcao) arraste.SentidoBarco);
 
                 //Guarda os barcos ja adicionados para serem redesenhados
                 barcosMapa.Add(new BoatData(new Bitmap(arraste.Image,
                                                       (arraste.SentidoBarco == Sentido.Horizontal ? 
                                                       new Size(CELL_SIZE * arraste.Size, CELL_SIZE) : 
                                                       new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1)));
-
                 arraste = default(DragData);
+
+                if (tabUser.EstaCompleto())
+                    IniciarCliente();
             }
             catch
             {
@@ -289,13 +349,21 @@ namespace batalha_naval
 
         private void board_DragLeave(object sender, EventArgs e)
         {
-            checkKey.Suspend();
+            inside = false;
+            keyChecker.WaitOne();
 
             //Retorna todas as informações, como se o drag não tivesse iniciado, para evitar que, caso o usuário 
             //tenha solto o drag fora do tabuleiro, ele continue guardando as informações e acabe perdendo um barco
             ((PictureBox)arraste.Sender).Image = arraste.Image;
+            if (arraste.SentidoBarco == Sentido.Vertical)
+                ((PictureBox)arraste.Sender).Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
             disponiveis[arraste.Navio]++;
+
+            object temp = arraste.Sender;
+
             arraste = default(DragData);
+            arraste.Sender = temp;
 
             board.Invalidate();
         }

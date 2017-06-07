@@ -30,7 +30,11 @@
         {
             this.board = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.gbCaragem = new System.Windows.Forms.GroupBox();
+            this.pnlConexao = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cbIPs = new System.Windows.Forms.ComboBox();
+            this.gbGaragem = new System.Windows.Forms.GroupBox();
             this.pbSubmarino = new System.Windows.Forms.PictureBox();
             this.pbDestroier = new System.Windows.Forms.PictureBox();
             this.pbCruzador = new System.Windows.Forms.PictureBox();
@@ -42,19 +46,15 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pbPortaAvioes = new System.Windows.Forms.PictureBox();
-            this.pnlConexao = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.board)).BeginInit();
             this.panel1.SuspendLayout();
-            this.gbCaragem.SuspendLayout();
+            this.pnlConexao.SuspendLayout();
+            this.gbGaragem.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbSubmarino)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDestroier)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).BeginInit();
-            this.pnlConexao.SuspendLayout();
             this.SuspendLayout();
             // 
             // board
@@ -77,39 +77,76 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.gbCaragem);
             this.panel1.Controls.Add(this.pnlConexao);
+            this.panel1.Controls.Add(this.gbGaragem);
             this.panel1.Location = new System.Drawing.Point(418, 12);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(240, 400);
             this.panel1.TabIndex = 1;
             // 
-            // gbCaragem
+            // pnlConexao
             // 
-            this.gbCaragem.Controls.Add(this.pbSubmarino);
-            this.gbCaragem.Controls.Add(this.pbDestroier);
-            this.gbCaragem.Controls.Add(this.pbCruzador);
-            this.gbCaragem.Controls.Add(this.pbEncouracado);
-            this.gbCaragem.Controls.Add(this.label7);
-            this.gbCaragem.Controls.Add(this.label6);
-            this.gbCaragem.Controls.Add(this.label5);
-            this.gbCaragem.Controls.Add(this.label4);
-            this.gbCaragem.Controls.Add(this.label3);
-            this.gbCaragem.Controls.Add(this.label2);
-            this.gbCaragem.Controls.Add(this.pbPortaAvioes);
-            this.gbCaragem.Location = new System.Drawing.Point(3, 0);
-            this.gbCaragem.Name = "gbCaragem";
-            this.gbCaragem.Size = new System.Drawing.Size(234, 397);
-            this.gbCaragem.TabIndex = 3;
-            this.gbCaragem.TabStop = false;
-            this.gbCaragem.Text = "Garagem";
+            this.pnlConexao.Controls.Add(this.button1);
+            this.pnlConexao.Controls.Add(this.label1);
+            this.pnlConexao.Controls.Add(this.cbIPs);
+            this.pnlConexao.Location = new System.Drawing.Point(3, 3);
+            this.pnlConexao.Name = "pnlConexao";
+            this.pnlConexao.Size = new System.Drawing.Size(234, 72);
+            this.pnlConexao.TabIndex = 4;
+            this.pnlConexao.Visible = false;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(113, 49);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(121, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Conectar";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(0, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(113, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Disponíveis para jogar";
+            // 
+            // cbIPs
+            // 
+            this.cbIPs.FormattingEnabled = true;
+            this.cbIPs.Location = new System.Drawing.Point(113, 22);
+            this.cbIPs.Name = "cbIPs";
+            this.cbIPs.Size = new System.Drawing.Size(121, 21);
+            this.cbIPs.TabIndex = 0;
+            // 
+            // gbGaragem
+            // 
+            this.gbGaragem.Controls.Add(this.pbSubmarino);
+            this.gbGaragem.Controls.Add(this.pbDestroier);
+            this.gbGaragem.Controls.Add(this.pbCruzador);
+            this.gbGaragem.Controls.Add(this.pbEncouracado);
+            this.gbGaragem.Controls.Add(this.label7);
+            this.gbGaragem.Controls.Add(this.label6);
+            this.gbGaragem.Controls.Add(this.label5);
+            this.gbGaragem.Controls.Add(this.label4);
+            this.gbGaragem.Controls.Add(this.label3);
+            this.gbGaragem.Controls.Add(this.label2);
+            this.gbGaragem.Controls.Add(this.pbPortaAvioes);
+            this.gbGaragem.Location = new System.Drawing.Point(3, 0);
+            this.gbGaragem.Name = "gbGaragem";
+            this.gbGaragem.Size = new System.Drawing.Size(234, 397);
+            this.gbGaragem.TabIndex = 3;
+            this.gbGaragem.TabStop = false;
+            this.gbGaragem.Text = "Garagem";
             // 
             // pbSubmarino
             // 
             this.pbSubmarino.Image = global::batalha_naval.Properties.Resources.Submarino;
             this.pbSubmarino.Location = new System.Drawing.Point(9, 325);
             this.pbSubmarino.Name = "pbSubmarino";
-            this.pbSubmarino.Size = new System.Drawing.Size(40, 40);
+            this.pbSubmarino.Size = new System.Drawing.Size(80, 40);
             this.pbSubmarino.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pbSubmarino.TabIndex = 10;
             this.pbSubmarino.TabStop = false;
@@ -216,43 +253,6 @@
             this.pbPortaAvioes.TabStop = false;
             this.pbPortaAvioes.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
             // 
-            // pnlConexao
-            // 
-            this.pnlConexao.Controls.Add(this.button1);
-            this.pnlConexao.Controls.Add(this.label1);
-            this.pnlConexao.Controls.Add(this.comboBox1);
-            this.pnlConexao.Location = new System.Drawing.Point(3, 3);
-            this.pnlConexao.Name = "pnlConexao";
-            this.pnlConexao.Size = new System.Drawing.Size(234, 72);
-            this.pnlConexao.TabIndex = 4;
-            this.pnlConexao.Visible = false;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(113, 49);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(121, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Conectar";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(-6, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(113, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Disponíveis para jogar";
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(113, 22);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 0;
-            // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -262,17 +262,18 @@
             this.Controls.Add(this.board);
             this.Name = "GameForm";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.board)).EndInit();
             this.panel1.ResumeLayout(false);
-            this.gbCaragem.ResumeLayout(false);
-            this.gbCaragem.PerformLayout();
+            this.pnlConexao.ResumeLayout(false);
+            this.pnlConexao.PerformLayout();
+            this.gbGaragem.ResumeLayout(false);
+            this.gbGaragem.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbSubmarino)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDestroier)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).EndInit();
-            this.pnlConexao.ResumeLayout(false);
-            this.pnlConexao.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -281,10 +282,10 @@
 
         private System.Windows.Forms.PictureBox board;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.GroupBox gbCaragem;
+        private System.Windows.Forms.GroupBox gbGaragem;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cbIPs;
         private System.Windows.Forms.Panel pnlConexao;
         private System.Windows.Forms.PictureBox pbPortaAvioes;
         private System.Windows.Forms.PictureBox pbSubmarino;
