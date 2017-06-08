@@ -1,4 +1,7 @@
-﻿namespace batalha_naval
+﻿using System;
+using System.Windows.Forms;
+
+namespace batalha_naval
 {
     partial class GameForm
     {
@@ -28,10 +31,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.board = new System.Windows.Forms.PictureBox();
+            this.boardPlayer = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pnlConexao = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnConectar = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.cbIPs = new System.Windows.Forms.ComboBox();
             this.gbGaragem = new System.Windows.Forms.GroupBox();
@@ -46,7 +49,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pbPortaAvioes = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.board)).BeginInit();
+            this.boardEnemy = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.boardPlayer)).BeginInit();
             this.panel1.SuspendLayout();
             this.pnlConexao.SuspendLayout();
             this.gbGaragem.SuspendLayout();
@@ -55,25 +59,25 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.boardEnemy)).BeginInit();
             this.SuspendLayout();
             // 
-            // board
+            // boardPlayer
             // 
-            this.board.AllowDrop = true;
-            this.board.Location = new System.Drawing.Point(12, 12);
-            this.board.Name = "board";
-            this.board.Size = new System.Drawing.Size(400, 400);
-            this.board.TabIndex = 0;
-            this.board.TabStop = false;
-            this.board.DragDrop += new System.Windows.Forms.DragEventHandler(this.board_DragDrop);
-            this.board.DragEnter += new System.Windows.Forms.DragEventHandler(this.board_DragEnter);
-            this.board.DragOver += new System.Windows.Forms.DragEventHandler(this.board_DragOver);
-            this.board.DragLeave += new System.EventHandler(this.board_DragLeave);
-            this.board.Paint += new System.Windows.Forms.PaintEventHandler(this.board_Paint);
-            this.board.MouseDown += new System.Windows.Forms.MouseEventHandler(this.board_MouseDown);
-            this.board.MouseEnter += new System.EventHandler(this.board_MouseEnter);
-            this.board.MouseLeave += new System.EventHandler(this.board_MouseLeave);
-            this.board.MouseMove += new System.Windows.Forms.MouseEventHandler(this.board_MouseMove);
+            this.boardPlayer.AllowDrop = true;
+            this.boardPlayer.Location = new System.Drawing.Point(12, 12);
+            this.boardPlayer.Name = "boardPlayer";
+            this.boardPlayer.Size = new System.Drawing.Size(400, 400);
+            this.boardPlayer.TabIndex = 0;
+            this.boardPlayer.TabStop = false;
+            this.boardPlayer.DragDrop += new System.Windows.Forms.DragEventHandler(this.board_DragDrop);
+            this.boardPlayer.DragEnter += new System.Windows.Forms.DragEventHandler(this.board_DragEnter);
+            this.boardPlayer.DragOver += new System.Windows.Forms.DragEventHandler(this.board_DragOver);
+            this.boardPlayer.DragLeave += new System.EventHandler(this.board_DragLeave);
+            this.boardPlayer.Paint += new System.Windows.Forms.PaintEventHandler(this.boardPlayer_Paint);
+            this.boardPlayer.MouseEnter += new System.EventHandler(this.board_MouseEnter);
+            this.boardPlayer.MouseLeave += new System.EventHandler(this.board_MouseLeave);
+            this.boardPlayer.MouseMove += new System.Windows.Forms.MouseEventHandler(this.board_MouseMove);
             // 
             // panel1
             // 
@@ -86,7 +90,7 @@
             // 
             // pnlConexao
             // 
-            this.pnlConexao.Controls.Add(this.button1);
+            this.pnlConexao.Controls.Add(this.btnConectar);
             this.pnlConexao.Controls.Add(this.label1);
             this.pnlConexao.Controls.Add(this.cbIPs);
             this.pnlConexao.Location = new System.Drawing.Point(3, 3);
@@ -95,14 +99,14 @@
             this.pnlConexao.TabIndex = 4;
             this.pnlConexao.Visible = false;
             // 
-            // button1
+            // btnConectar
             // 
-            this.button1.Location = new System.Drawing.Point(113, 49);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(121, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Conectar";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnConectar.Location = new System.Drawing.Point(113, 49);
+            this.btnConectar.Name = "btnConectar";
+            this.btnConectar.Size = new System.Drawing.Size(121, 23);
+            this.btnConectar.TabIndex = 2;
+            this.btnConectar.Text = "Conectar";
+            this.btnConectar.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -253,17 +257,32 @@
             this.pbPortaAvioes.TabStop = false;
             this.pbPortaAvioes.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ArrasteBarco);
             // 
+            // boardEnemy
+            // 
+            this.boardEnemy.Location = new System.Drawing.Point(418, 12);
+            this.boardEnemy.Name = "boardEnemy";
+            this.boardEnemy.Size = new System.Drawing.Size(400, 400);
+            this.boardEnemy.TabIndex = 2;
+            this.boardEnemy.TabStop = false;
+            this.boardEnemy.Visible = false;
+            this.boardEnemy.Paint += new System.Windows.Forms.PaintEventHandler(this.boardEnemy_Paint);
+            this.boardEnemy.MouseDown += new System.Windows.Forms.MouseEventHandler(this.boardEnemy_MouseDown);
+            this.boardEnemy.MouseEnter += new System.EventHandler(this.boardEnemy_MouseEnter);
+            this.boardEnemy.MouseLeave += new System.EventHandler(this.boardEnemy_MouseLeave);
+            this.boardEnemy.MouseMove += new System.Windows.Forms.MouseEventHandler(this.boardEnemy_MouseMove);
+            // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(670, 424);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.board);
+            this.Controls.Add(this.boardPlayer);
+            this.Controls.Add(this.boardEnemy);
             this.Name = "GameForm";
-            this.Text = "Form1";
+            this.Text = "Batalha Naval";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameForm_FormClosing);
-            ((System.ComponentModel.ISupportInitialize)(this.board)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.boardPlayer)).EndInit();
             this.panel1.ResumeLayout(false);
             this.pnlConexao.ResumeLayout(false);
             this.pnlConexao.PerformLayout();
@@ -274,16 +293,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbCruzador)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbEncouracado)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbPortaAvioes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.boardEnemy)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox board;
+        private System.Windows.Forms.PictureBox boardPlayer;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.GroupBox gbGaragem;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnConectar;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cbIPs;
         private System.Windows.Forms.Panel pnlConexao;
@@ -298,6 +318,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.PictureBox boardEnemy;
     }
 }
 
