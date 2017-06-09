@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using BatalhaNaval;
+using System.Windows.Forms;
 
 namespace batalha_naval
 {
@@ -16,11 +17,13 @@ namespace batalha_naval
             usuario.OnClienteRequisitandoConexao += RequisitandoConexao;
             usuario.OnClienteConectado += ClienteConectado;
             usuario.OnClienteDesconectado += ClienteDesconectado;
+
             usuario.OnTiroRecebido += TiroRecebido;
+            usuario.OnDarTiro += DarTiro;
 
+            usuario.OnResultadoDeTiro += ResultadoTiro;
+            
             usuario.Iniciar();
-
-            //InicializarJogo();
 
             gbGaragem.Visible = false;
             pnlConexao.Visible = true;
@@ -36,17 +39,39 @@ namespace batalha_naval
 
         private void ClienteDesconectado(IPAddress addr)
         {
-            inGame = false;
+            if (InvokeRequired)
+                Invoke(new Action(() => { ClienteDesconectado(addr); }));
+            else
+            {
+                MessageBox.Show("mamou");
+                SairJogo();
+            }
         }
 
         private void ClienteConectado(IPAddress addr)
         {
-            inGame = true;
+            if (InvokeRequired)
+                Invoke(new Action(() => { ClienteConectado(addr); }));
+            else
+            {
+                InicializarJogo();
+                inGame = true;
+            }
         }
 
         private bool RequisitandoConexao(System.Net.IPAddress addr)
         {
-            return true;
+            bool r = false;
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { r = RequisitandoConexao(addr); }));
+                return r;
+            }
+            else
+            {
+                bool b = MessageBox.Show(this, "Deseja se conectar ao " + addr.ToString() + "?", "Conexao", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
+                return b;
+            }
         }
 
         private void ClienteDisponivel(System.Net.IPAddress addr)

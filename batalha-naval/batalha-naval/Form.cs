@@ -52,6 +52,11 @@ namespace batalha_naval
         private ClienteP2P usuario;
         private Tabuleiro tabUser;
 
+        private void btnConectar_Click(object sender, EventArgs e)
+        {
+            usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
+        }
+
         private TipoDeNavio draggedBoat;
 
         public GameForm()
@@ -89,6 +94,14 @@ namespace batalha_naval
             t.Interval = 1000 / WATER_CHANGE_FPS;
             t.Tick    += FrameTick;
             t.Start();
+
+            tabUser.PosicionarNavio(TipoDeNavio.PortaAvioes, 0, 0, Direcao.Direita);
+            tabUser.PosicionarNavio(TipoDeNavio.Encouracado, 0, 1, Direcao.Direita);
+            tabUser.PosicionarNavio(TipoDeNavio.Cruzador, 0, 2, Direcao.Direita);
+            tabUser.PosicionarNavio(TipoDeNavio.Destroier, 0, 3, Direcao.Direita);
+            tabUser.PosicionarNavio(TipoDeNavio.Submarino, 0, 4, Direcao.Direita);
+
+            IniciarCliente();
         }
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -19,6 +19,20 @@ namespace batalha_naval
             boardEnemy.Invalidate();
         }
 
+        private void SairJogo()
+        {
+            panel1.Visible = true;
+            boardEnemy.Visible = false;
+            this.AutoSize = false;
+
+            inGame = false;
+            inside = false;
+            cell = EMPTY_POINT;
+
+            boardPlayer.Invalidate();
+            boardEnemy.Invalidate();
+        }
+
         private void boardEnemy_MouseEnter(object sender, EventArgs e)
         {
             if (inGame)
@@ -56,6 +70,16 @@ namespace batalha_naval
         }
 
         private void TiroRecebido(Tiro t)
+        {
+            
+        }
+
+        private void ResultadoTiro(Tiro t, ResultadoDeTiro resultado)
+        {
+            
+        }
+
+        private void DarTiro()
         {
             
         }
