@@ -7,6 +7,16 @@ namespace batalha_naval
 {
     public partial class GameForm
     {
+        private bool inGame = false, stopRunning = false;
+        private String userName;
+        private ClienteP2P usuario;
+        private Tabuleiro tabUser;
+
+        private void btnConectar_Click(object sender, EventArgs e)
+        {
+            usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
+        }
+
         private void IniciarCliente()
         {
             usuario = new ClienteP2P("Igor", tabUser);

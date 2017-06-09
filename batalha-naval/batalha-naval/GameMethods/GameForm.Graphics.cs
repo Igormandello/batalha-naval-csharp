@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,6 +7,9 @@ namespace batalha_naval
 {
     public partial class GameForm
     {
+        private List<BoatData> barcosMapa = new List<BoatData>();
+        private List<BatalhaNaval.Tiro> tirosRecebidos;
+
         Random r = new Random();
         private void boardPlayer_Paint(object sender, PaintEventArgs e)
         {
@@ -39,6 +43,10 @@ namespace batalha_naval
 
             foreach (BoatData bd in barcosMapa)
                 e.Graphics.DrawImage(bd.Image, bd.Point);
+
+            if (tirosRecebidos != null)
+                foreach (BatalhaNaval.Tiro t in tirosRecebidos)
+                    e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 
         private void boardEnemy_Paint(object sender, PaintEventArgs e)
