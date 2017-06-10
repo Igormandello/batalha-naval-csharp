@@ -3,11 +3,20 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Input;
 using BatalhaNaval;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace batalha_naval
 {
     public partial class GameForm
     {
+        private Dictionary<TipoDeNavio, int> disponiveis = new Dictionary<TipoDeNavio, int>();
+
+        private TipoDeNavio draggedBoat;
+        private DragData arraste = default(DragData);
+        private Semaphore keyChecker;
+        private Thread checkKey;
+
         private void run()
         {
             bool pressed = false;

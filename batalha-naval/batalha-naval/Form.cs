@@ -40,25 +40,6 @@ namespace batalha_naval
         private System.Windows.Forms.Timer splash;
         #endregion
 
-        private Dictionary<TipoDeNavio, int> disponiveis = new Dictionary<TipoDeNavio, int>();
-        private List<BoatData> barcosMapa = new List<BoatData>();
-
-        private DragData arraste = default(DragData);
-        private Semaphore keyChecker; 
-        private Thread checkKey;
-
-        private bool inGame = false, stopRunning = false;
-        private String userName;
-        private ClienteP2P usuario;
-        private Tabuleiro tabUser;
-
-        private void btnConectar_Click(object sender, EventArgs e)
-        {
-            usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
-        }
-
-        private TipoDeNavio draggedBoat;
-
         public GameForm()
         {
             InitializeComponent();
