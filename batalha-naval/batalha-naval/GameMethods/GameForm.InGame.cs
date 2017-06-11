@@ -84,6 +84,7 @@ namespace batalha_naval
 
         private void TiroRecebido(Tiro t)
         {
+            MessageBox.Show("3");
             tirosRecebidos.Add(t);
 
             boardPlayer.Invalidate();
@@ -91,11 +92,12 @@ namespace batalha_naval
 
         private void ResultadoTiro(Tiro t, ResultadoDeTiro resultado)
         {
-
+            MessageBox.Show("2");
         }
 
         private void DarTiro()
         {
+            MessageBox.Show("1");
             shooting = false;
         }
     }

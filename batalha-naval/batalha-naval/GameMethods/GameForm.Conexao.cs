@@ -53,7 +53,7 @@ namespace batalha_naval
                 Invoke(new Action(() => { ClienteDesconectado(addr); }));
             else
             {
-                MessageBox.Show("mamou");
+                MessageBox.Show("Vazou");
                 SairJogo();
             }
         }

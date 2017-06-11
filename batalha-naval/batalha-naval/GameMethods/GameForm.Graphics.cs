@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BatalhaNaval;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -44,8 +45,8 @@ namespace batalha_naval
             foreach (BoatData bd in barcosMapa)
                 e.Graphics.DrawImage(bd.Image, bd.Point);
 
-            if (tirosRecebidos != null)
-                foreach (BatalhaNaval.Tiro t in tirosRecebidos)
+            if (usuario.TirosRecebidos != null)
+                foreach (BatalhaNaval.Tiro t in usuario.TirosRecebidos)
                     e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 
@@ -58,6 +59,10 @@ namespace batalha_naval
                 Pen p = new Pen(Color.Aqua, 2);
                 e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
             }
+
+            //if (usuario.TirosDados != null)
+                //foreach (KeyValuePair<Tiro, ResultadoDeTiro> pair in _tirosDados)
+                    //e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(pair.Key.X * CELL_SIZE + 1, pair.Key.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 
         private void DrawBackground(PaintEventArgs e)
@@ -79,7 +84,7 @@ namespace batalha_naval
             }
         }
 
-        private void MouseMove(Point p)
+        private new void MouseMove(Point p)
         {
             //Caso a posição do mouse tenha mudado, ele troca a celula atual e redesenha
             if (inside || !arraste.Equals(default(DragData)))
