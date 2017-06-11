@@ -31,6 +31,7 @@ namespace batalha_naval
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameForm));
             this.boardPlayer = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pnlConexao = new System.Windows.Forms.Panel();
@@ -280,6 +281,7 @@ namespace batalha_naval
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.boardPlayer);
             this.Controls.Add(this.boardEnemy);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "GameForm";
             this.Text = "Batalha Naval";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameForm_FormClosing);
