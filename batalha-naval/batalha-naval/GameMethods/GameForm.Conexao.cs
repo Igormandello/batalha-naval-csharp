@@ -14,7 +14,14 @@ namespace batalha_naval
 
         private void btnConectar_Click(object sender, EventArgs e)
         {
-            usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
+            try
+            {
+                usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
+            }
+            catch
+            {
+                MessageBox.Show("Erro ao tentar enviar solicitação de conexão");
+            }
         }
 
         private void IniciarCliente()
@@ -28,11 +35,10 @@ namespace batalha_naval
             usuario.OnClienteConectado += ClienteConectado;
             usuario.OnClienteDesconectado += ClienteDesconectado;
 
-            usuario.OnTiroRecebido += TiroRecebido;
             usuario.OnDarTiro += DarTiro;
+            usuario.OnResultadoDeTiro += Usuario_OnResultadoDeTiro; ;
+            usuario.OnTiroRecebido += TiroRecebido;
 
-            usuario.OnResultadoDeTiro += ResultadoTiro;
-            
             usuario.Iniciar();
 
             gbGaragem.Visible = false;
@@ -43,7 +49,7 @@ namespace batalha_naval
         {
             if (InvokeRequired)
                 Invoke(new Action(() => { ClienteIndisponivel(addr); }));
-            else //if (cbIPs.Items.IndexOf(addr) >= 0)
+            else
                 cbIPs.Items.Remove(addr);
         }
 
@@ -53,7 +59,7 @@ namespace batalha_naval
                 Invoke(new Action(() => { ClienteDesconectado(addr); }));
             else
             {
-                MessageBox.Show("Vazou");
+                MessageBox.Show("Seu inimigo não aguentou a pressão e desistiu");
                 SairJogo();
             }
         }
@@ -79,7 +85,7 @@ namespace batalha_naval
             }
             else
             {
-                bool b = MessageBox.Show(this, "Deseja se conectar ao " + addr.ToString() + "?", "Conexao", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
+                bool b = MessageBox.Show(this, "O usuário " + usuario.NomeRemoto + " ( "+ addr.ToString() + " ) deseja realizar conexão. Aceitar?", "Conexão", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes;
                 return b;
             }
         }

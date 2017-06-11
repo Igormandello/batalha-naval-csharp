@@ -92,8 +92,10 @@ namespace batalha_naval
                 }
 
                 //Se há uma imagem, ainda existem barcos para serem arrastados, então ele inicia um novo arraste
-                arraste = new DragData(draggedBoat, Sentido.Horizontal, sender);
-                boardPlayer.DoDragDrop(arraste.Image, DragDropEffects.Copy);
+                arraste = default(DragData);
+                arraste.Sender = sender;
+
+                boardPlayer.DoDragDrop(((PictureBox)sender).Image, DragDropEffects.Copy);
             }
         }
 
@@ -144,6 +146,14 @@ namespace batalha_naval
                                                       (arraste.SentidoBarco == Sentido.Horizontal ?
                                                       new Size(CELL_SIZE * arraste.Size, CELL_SIZE) :
                                                       new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1)));
+
+                if (arraste.SentidoBarco == Sentido.Horizontal)
+                    for (int i = 0; i < arraste.Navio.Tamanho(); i++)
+                        pontosBarcos.Add(new Point(cell.X + i, cell.Y));
+                else
+                    for (int i = 0; i < arraste.Navio.Tamanho(); i++)
+                        pontosBarcos.Add(new Point(cell.X, cell.Y + i));
+
                 arraste = default(DragData);
 
                 if (tabUser.EstaCompleto())

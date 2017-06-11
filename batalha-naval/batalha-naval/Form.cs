@@ -22,22 +22,28 @@ namespace batalha_naval
         public const int                   DEFAULT_TILESIZE = 32,
                                            CELL_SIZE        = 40,
                                            WATER_CHANGE_FPS = 1,
+                                           EXPLOSION_FPS    = 6,
                                            SPLASH_FPS       = 6;
 
         public const string                RESOURCES_FOLDER     = "../../../../Resources/";
         public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.wav", "watersplash2.wav" };
-        public static readonly List<Image> WATER_SPLASH_FRAMES  = TileSet.SplitImage(RESOURCES_FOLDER + "splash.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
-        public static readonly List<Image> WATER_TILE_FRAMES    = TileSet.SplitImage(RESOURCES_FOLDER + "water_tiles.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE);
+        public static readonly List<Image> WATER_SPLASH_FRAMES  = TileSet.SplitImage(RESOURCES_FOLDER + "splash.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE),
+                                           WATER_TILE_FRAMES    = TileSet.SplitImage(RESOURCES_FOLDER + "water_tiles.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE),
+                                           EXPLOSION_FRAMES     = TileSet.SplitImage(batalha_naval.Properties.Resources.explosion, DEFAULT_TILESIZE, DEFAULT_TILESIZE);
         public static readonly Point EMPTY_POINT                = new Point(-1, -1);
 
+        enum Animacao { Espirrando, Explodindo, Nenhum };
+
+        private Animacao enemy = Animacao.Nenhum, player = Animacao.Nenhum;
         private bool inside = false, shooting = false;
 
-        private Point cell  = EMPTY_POINT, splashCell = EMPTY_POINT;
-        private SoundPlayer player = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASHES_SOUND[0]);
+        private Point cell  = EMPTY_POINT, targetCell = EMPTY_POINT, receivedCell = EMPTY_POINT;
+
+        private SoundPlayer soundPlayer = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASHES_SOUND[0]);
 
         private Image[,] water;
 
-        private System.Windows.Forms.Timer splash;
+        private System.Windows.Forms.Timer splash, explosion;
         #endregion
 
         public GameForm()
@@ -71,18 +77,22 @@ namespace batalha_naval
             splash.Interval = 1000 / SPLASH_FPS;
             splash.Tick    += SplashTick;
 
+            explosion = new System.Windows.Forms.Timer();
+            explosion.Interval = 1000 / EXPLOSION_FPS;
+            explosion.Tick += ExplosionTick;
+
             var t      = new System.Windows.Forms.Timer();
             t.Interval = 1000 / WATER_CHANGE_FPS;
             t.Tick    += FrameTick;
             t.Start();
 
-            tabUser.PosicionarNavio(TipoDeNavio.PortaAvioes, 0, 0, Direcao.Direita);
-            tabUser.PosicionarNavio(TipoDeNavio.Encouracado, 0, 1, Direcao.Direita);
-            tabUser.PosicionarNavio(TipoDeNavio.Cruzador, 0, 2, Direcao.Direita);
-            tabUser.PosicionarNavio(TipoDeNavio.Destroier, 0, 3, Direcao.Direita);
-            tabUser.PosicionarNavio(TipoDeNavio.Submarino, 0, 4, Direcao.Direita);
+            //tabUser.PosicionarNavio(TipoDeNavio.PortaAvioes, 0, 0, Direcao.Direita);
+            //tabUser.PosicionarNavio(TipoDeNavio.Encouracado, 0, 1, Direcao.Direita);
+            //tabUser.PosicionarNavio(TipoDeNavio.Cruzador, 0, 2, Direcao.Direita);
+            //tabUser.PosicionarNavio(TipoDeNavio.Destroier, 0, 3, Direcao.Direita);
+            //tabUser.PosicionarNavio(TipoDeNavio.Submarino, 0, 4, Direcao.Direita);
 
-            IniciarCliente();
+            //IniciarCliente();
         }
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -125,21 +135,37 @@ namespace batalha_naval
             boardEnemy.Invalidate();
         }
 
-        private int index = -1;
+        private int indexS = -1, indexE = -1;
         private void SplashTick(object sender, EventArgs e)
         {
-            if (index == WATER_SPLASH_FRAMES.Count - 1)
+            if (indexS == WATER_SPLASH_FRAMES.Count - 1)
             {
-                index = -1;
-                splashCell = Point.Empty;
+                indexS = -1;
+                targetCell = EMPTY_POINT;
 
-                shooting = false;
                 splash.Stop();
             }
             else
-                index++;
+                indexS++;
 
             boardEnemy.Invalidate();
+            boardPlayer.Invalidate();
+        }
+
+        private void ExplosionTick(object sender, EventArgs e)
+        {
+            if (indexE == EXPLOSION_FRAMES.Count - 1)
+            {
+                indexE = -1;
+                targetCell = EMPTY_POINT;
+
+                explosion.Stop();
+            }
+            else
+                indexE++;
+
+            boardEnemy.Invalidate();
+            boardPlayer.Invalidate();
         }
         #endregion
     }

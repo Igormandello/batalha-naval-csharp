@@ -19,8 +19,6 @@ namespace batalha_naval
 
             boardPlayer.Invalidate();
             boardEnemy.Invalidate();
-
-            tirosRecebidos = new System.Collections.Generic.List<Tiro>();
         }
 
         private void SairJogo()
@@ -65,40 +63,92 @@ namespace batalha_naval
             if (inGame)
                 if (!shooting)
                 {
-                    player.Play();
+                    //Verifica se o lugar que o usuário está tentando atirar não foi usado ainda
+                    foreach (Tiro t in usuario.TirosDados)
+                        if (t.X == cell.X && t.Y == cell.Y)
+                        {
+                            MessageBox.Show("Você já atirou neste lugar!");
+                            return;
+                        }
 
-                    splash.Start();
-                    splashCell = cell;
                     shooting = true;
+                    targetCell = cell;
 
                     //Envia o tiro para o cliente
-                    usuario.DarTiro(splashCell.X, splashCell.Y);
-
-                    //Atualiza a tela, para a animação
-                    boardEnemy.Invalidate();
-                    boardPlayer.Invalidate();
+                    usuario.DarTiro(targetCell.X, targetCell.Y);
                 }
                 else
-                    MessageBox.Show(this, "Ta apressado demais", "Não é seu turno!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show(this, "Não é seu turno!", "Ta apressado demais", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void TiroRecebido(Tiro t)
         {
-            MessageBox.Show("3");
-            tirosRecebidos.Add(t);
+            ResultadoDeTiro resultado = t.Aplicar(tabUser);
+            Invoke(new Action(() =>
+            {
+                receivedCell = new System.Drawing.Point(t.X, t.Y);
 
-            boardPlayer.Invalidate();
+                ResultadoDeTiro resultadoTotal = usuario.TirosRecebidos.Resultado(t);
+
+                if (resultadoTotal.HasFlag(ResultadoDeTiro.Ganhou))
+                {
+                    usuario.Close();
+                    SairJogo();
+
+                    IniciarCliente();
+                }
+
+                if (resultado == ResultadoDeTiro.Errou)
+                {
+                    player = Animacao.Espirrando;
+                    splash.Start();
+                }
+                else
+                {
+                    player = Animacao.Explodindo;
+                    explosion.Start();
+                }
+
+                boardPlayer.Invalidate();
+                boardEnemy.Invalidate();
+            }));
         }
 
-        private void ResultadoTiro(Tiro t, ResultadoDeTiro resultado)
+        private void Usuario_OnResultadoDeTiro(Tiro t, ResultadoDeTiro resultado)
         {
-            MessageBox.Show("2");
+            Invoke(new Action(() =>
+            {
+                //Atualiza a tela, para a animação
+                boardEnemy.Invalidate();
+                boardPlayer.Invalidate();
+
+                //soundPlayer.Play();
+
+                if (resultado.HasFlag(ResultadoDeTiro.Ganhou))
+                    usuario.Close();
+
+                if (resultado.HasFlag(ResultadoDeTiro.Afundou))
+                    MessageBox.Show(this, "O " + Enum.GetName(typeof(TipoDeNavio), resultado.TipoDeNavio()) + " inimigo foi afundado");
+
+                if (resultado == ResultadoDeTiro.Errou)
+                {
+                    enemy = Animacao.Espirrando;
+                    splash.Start();
+                }
+                else
+                {
+                    enemy = Animacao.Explodindo;
+                    explosion.Start();
+                }
+            }));
         }
 
         private void DarTiro()
         {
-            MessageBox.Show("1");
-            shooting = false;
+            Invoke(new Action(() =>
+            {
+                shooting = false;
+            }));
         }
     }
 }

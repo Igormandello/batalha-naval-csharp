@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 ﻿using BatalhaNaval;
 using System;
-=======
-﻿using System;
->>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -12,8 +8,8 @@ namespace batalha_naval
 {
     public partial class GameForm
     {
+        private List<Point> pontosBarcos  = new List<Point>();
         private List<BoatData> barcosMapa = new List<BoatData>();
-        private List<BatalhaNaval.Tiro> tirosRecebidos;
 
         Random r = new Random();
         private void boardPlayer_Paint(object sender, PaintEventArgs e)
@@ -37,6 +33,11 @@ namespace batalha_naval
                     if ((cell.X + arraste.Size > 10 && arraste.SentidoBarco == Sentido.Horizontal) || (cell.Y + arraste.Size > 10 && arraste.SentidoBarco == Sentido.Vertical))
                         b = new Pen(Color.FromArgb(100, Color.Red)).Brush;
 
+                    for (int i = 0; i < arraste.Size; i++)
+                        for (int n = 0; n < pontosBarcos.Count; n++)
+                            if (pontosBarcos[n].X == (cell.X + (arraste.SentidoBarco == Sentido.Horizontal ? i : 0)) && pontosBarcos[i].Y == (cell.Y + (arraste.SentidoBarco == Sentido.Vertical ? i : 0)))
+                                b = new Pen(Color.FromArgb(100, Color.Red)).Brush;
+
                     e.Graphics.FillRectangle(b, validateRect);
                 }
                 //Caso contrário, contorna a célula que o usuário está passando com o mouse
@@ -49,14 +50,20 @@ namespace batalha_naval
             foreach (BoatData bd in barcosMapa)
                 e.Graphics.DrawImage(bd.Image, bd.Point);
 
-<<<<<<< HEAD
-            if (usuario.TirosRecebidos != null)
-                foreach (BatalhaNaval.Tiro t in usuario.TirosRecebidos)
-=======
-            if (tirosRecebidos != null)
-                foreach (BatalhaNaval.Tiro t in tirosRecebidos)
->>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
-                    e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
+            if (player == Animacao.Espirrando)
+            {
+                if (indexS >= 0)
+                    using (Bitmap b = new Bitmap(WATER_SPLASH_FRAMES[indexS], new Size(CELL_SIZE, CELL_SIZE)))
+                        e.Graphics.DrawImage(b, receivedCell.X * 40, receivedCell.Y * 40);
+            }
+            else if (player == Animacao.Explodindo)
+                if (indexE >= 0)
+                   using (Bitmap b = new Bitmap(EXPLOSION_FRAMES[indexE], new Size(CELL_SIZE, CELL_SIZE)))
+                       e.Graphics.DrawImage(b, receivedCell.X * 40, receivedCell.Y * 40);
+
+            if (usuario != null)
+                foreach (Tiro t in usuario.TirosRecebidos)
+                    e.Graphics.FillRectangle(new Pen(Color.FromArgb(100, Color.IndianRed)).Brush, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 
         private void boardEnemy_Paint(object sender, PaintEventArgs e)
@@ -69,9 +76,20 @@ namespace batalha_naval
                 e.Graphics.DrawRectangle(p, new Rectangle(new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1), new Size(CELL_SIZE, CELL_SIZE)));
             }
 
-            //if (usuario.TirosDados != null)
-                //foreach (KeyValuePair<Tiro, ResultadoDeTiro> pair in _tirosDados)
-                    //e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(pair.Key.X * CELL_SIZE + 1, pair.Key.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
+            if (enemy == Animacao.Espirrando)
+            {
+                if (indexS >= 0)
+                    using (Bitmap b = new Bitmap(WATER_SPLASH_FRAMES[indexS], new Size(CELL_SIZE, CELL_SIZE)))
+                        e.Graphics.DrawImage(b, targetCell.X * 40, targetCell.Y * 40);
+            }
+            else if (enemy == Animacao.Explodindo)
+                if (indexE >= 0)
+                    using (Bitmap b = new Bitmap(EXPLOSION_FRAMES[indexE], new Size(CELL_SIZE, CELL_SIZE)))
+                        e.Graphics.DrawImage(b, targetCell.X * 40, targetCell.Y * 40);
+
+            if (usuario != null)
+                foreach (Tiro t in usuario.TirosDados)
+                    e.Graphics.FillRectangle(new Pen(Color.FromArgb(100, Color.IndianRed)).Brush, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 
         private void DrawBackground(PaintEventArgs e)
@@ -79,11 +97,6 @@ namespace batalha_naval
             for (int n = 0; n < 10; n++)
                 for (int i = 0; i < 10; i++)
                     e.Graphics.DrawImage(water[n, i], new Point(CELL_SIZE * i, CELL_SIZE * n));
-
-
-            if (index >= 0)
-                using (Bitmap b = new Bitmap(WATER_SPLASH_FRAMES[index], new Size(CELL_SIZE, CELL_SIZE)))
-                    e.Graphics.DrawImage(b, splashCell.X * 40, splashCell.Y * 40);
 
             Pen p = new Pen(Color.Black, 2);
             for (int i = 0; i < 10; i++)
