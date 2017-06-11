@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 ﻿using BatalhaNaval;
 using System;
+=======
+﻿using System;
+>>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -45,8 +49,13 @@ namespace batalha_naval
             foreach (BoatData bd in barcosMapa)
                 e.Graphics.DrawImage(bd.Image, bd.Point);
 
+<<<<<<< HEAD
             if (usuario.TirosRecebidos != null)
                 foreach (BatalhaNaval.Tiro t in usuario.TirosRecebidos)
+=======
+            if (tirosRecebidos != null)
+                foreach (BatalhaNaval.Tiro t in tirosRecebidos)
+>>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
                     e.Graphics.FillRectangle(Brushes.IndianRed, new Rectangle(t.X * CELL_SIZE + 1, t.Y * CELL_SIZE + 1, CELL_SIZE, CELL_SIZE));
         }
 

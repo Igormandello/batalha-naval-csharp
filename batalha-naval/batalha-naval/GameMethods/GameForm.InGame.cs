@@ -84,7 +84,10 @@ namespace batalha_naval
 
         private void TiroRecebido(Tiro t)
         {
+<<<<<<< HEAD
             MessageBox.Show("3");
+=======
+>>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
             tirosRecebidos.Add(t);
 
             boardPlayer.Invalidate();
@@ -92,12 +95,19 @@ namespace batalha_naval
 
         private void ResultadoTiro(Tiro t, ResultadoDeTiro resultado)
         {
+<<<<<<< HEAD
             MessageBox.Show("2");
+=======
+
+>>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
         }
 
         private void DarTiro()
         {
+<<<<<<< HEAD
             MessageBox.Show("1");
+=======
+>>>>>>> e137e44b71230ea11dddd3a88e34acc8e73a9e35
             shooting = false;
         }
     }
