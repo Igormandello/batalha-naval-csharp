@@ -68,6 +68,7 @@ namespace batalha_naval
         {
             if (((PictureBox)sender).Image != null)
             {
+                //Verificação de qual picturebox veio a chamada de método
                 switch (((PictureBox)sender).Name.Substring(2))
                 {
                     case "PortaAvioes":
@@ -107,11 +108,6 @@ namespace batalha_naval
 
                 if (e.Data.GetDataPresent(DataFormats.Bitmap))
                 {
-                    //Para a verificação do usuário tentando girar o navio
-                    //if (checkkey.threadstate == system.threading.threadstate.unstarted)
-                    //    checkkey.start();
-                    //else
-                    //    checkkey.resume();
                     try
                     {
                         keyChecker.Release();
@@ -147,6 +143,7 @@ namespace batalha_naval
                                                       new Size(CELL_SIZE * arraste.Size, CELL_SIZE) :
                                                       new Size(CELL_SIZE, CELL_SIZE * arraste.Size))), new Point(cell.X * CELL_SIZE + 1, cell.Y * CELL_SIZE + 1)));
 
+                //Adiciona os pontos do mapa já utilizados
                 if (arraste.SentidoBarco == Sentido.Horizontal)
                     for (int i = 0; i < arraste.Navio.Tamanho(); i++)
                         pontosBarcos.Add(new Point(cell.X + i, cell.Y));

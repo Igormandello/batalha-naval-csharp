@@ -16,7 +16,8 @@ namespace batalha_naval
         {
             try
             {
-                usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + ""));
+                if (!usuario.SolicitarConexao(IPAddress.Parse(cbIPs.SelectedItem + "")))
+                    MessageBox.Show(this, "Seu adversário não aceitou a conexão! :c", "Tente novamente!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch
             {
@@ -26,6 +27,7 @@ namespace batalha_naval
 
         private void IniciarCliente()
         {
+            //Inicializa um novo cliente com o nome passado e atribui os eventos
             usuario = new ClienteP2P("Igor", tabUser);
 
             usuario.OnClienteDisponivel += ClienteDisponivel;
@@ -47,6 +49,7 @@ namespace batalha_naval
 
         private void ClienteIndisponivel(IPAddress addr)
         {
+            //Quando um cliente sair da rede, o remove do combobox.
             if (InvokeRequired)
                 Invoke(new Action(() => { ClienteIndisponivel(addr); }));
             else
@@ -55,6 +58,7 @@ namespace batalha_naval
 
         private void ClienteDesconectado(IPAddress addr)
         {
+            //Quando a pessoa com quem você está conectada sai do jogo
             if (InvokeRequired)
                 Invoke(new Action(() => { ClienteDesconectado(addr); }));
             else
@@ -66,6 +70,7 @@ namespace batalha_naval
 
         private void ClienteConectado(IPAddress addr)
         {
+            //Quando você se conecta com alguém
             if (InvokeRequired)
                 Invoke(new Action(() => { ClienteConectado(addr); }));
             else
@@ -77,6 +82,7 @@ namespace batalha_naval
 
         private bool RequisitandoConexao(System.Net.IPAddress addr)
         {
+            //Se tem alguem querendo se conectar a você
             bool r = false;
             if (InvokeRequired)
             {
@@ -92,6 +98,7 @@ namespace batalha_naval
 
         private void ClienteDisponivel(System.Net.IPAddress addr)
         {
+            //Quando alguem aparece na rede, o coloca no combobox
             if (InvokeRequired)
                 Invoke(new Action(() => { ClienteDisponivel(addr); }));
             else if (!cbIPs.Items.Contains(addr))

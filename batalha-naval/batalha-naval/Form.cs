@@ -22,11 +22,12 @@ namespace batalha_naval
         public const int                   DEFAULT_TILESIZE = 32,
                                            CELL_SIZE        = 40,
                                            WATER_CHANGE_FPS = 1,
-                                           EXPLOSION_FPS    = 6,
+                                           EXPLOSION_FPS    = 14,
                                            SPLASH_FPS       = 6;
 
         public const string                RESOURCES_FOLDER     = "../../../../Resources/";
-        public static readonly string[]    WATER_SPLASHES_SOUND = new string[] { "watersplash.wav", "watersplash2.wav" };
+        public static readonly string      WATER_SPLASH_SOUND   = "watersplash.wav",
+                                           EXPLOSION_SOUND      = "explosion.wav";
         public static readonly List<Image> WATER_SPLASH_FRAMES  = TileSet.SplitImage(RESOURCES_FOLDER + "splash.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE),
                                            WATER_TILE_FRAMES    = TileSet.SplitImage(RESOURCES_FOLDER + "water_tiles.png", DEFAULT_TILESIZE, DEFAULT_TILESIZE),
                                            EXPLOSION_FRAMES     = TileSet.SplitImage(batalha_naval.Properties.Resources.explosion, DEFAULT_TILESIZE, DEFAULT_TILESIZE);
@@ -39,7 +40,8 @@ namespace batalha_naval
 
         private Point cell  = EMPTY_POINT, targetCell = EMPTY_POINT, receivedCell = EMPTY_POINT;
 
-        private SoundPlayer soundPlayer = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASHES_SOUND[0]);
+        private SoundPlayer soundPlayerS = new SoundPlayer(RESOURCES_FOLDER + WATER_SPLASH_SOUND),
+                            soundPlayerE = new SoundPlayer(RESOURCES_FOLDER + EXPLOSION_SOUND);
 
         private Image[,] water;
 
@@ -50,16 +52,17 @@ namespace batalha_naval
         {
             InitializeComponent();
 
-            //UserForm user = new UserForm();
-            //if (user.ShowDialog(this) == DialogResult.OK)
-            //   userName = user.User;
-            //else
-            //    this.Dispose();
+            UserForm user = new UserForm();
+            if (user.ShowDialog(this) == DialogResult.OK)
+               userName = user.User;
+            else
+                this.Dispose();
 
             keyChecker = new Semaphore(0, 2);
             keyChecker.Release();
 
             tabUser = new Tabuleiro();
+            //Numero de barcos disponíveis atualmente
             disponiveis.Add(TipoDeNavio.PortaAvioes, TipoDeNavio.PortaAvioes.Limite());
             disponiveis.Add(TipoDeNavio.Encouracado, TipoDeNavio.Encouracado.Limite());
             disponiveis.Add(TipoDeNavio.Cruzador, TipoDeNavio.Cruzador.Limite());
@@ -85,14 +88,6 @@ namespace batalha_naval
             t.Interval = 1000 / WATER_CHANGE_FPS;
             t.Tick    += FrameTick;
             t.Start();
-
-            //tabUser.PosicionarNavio(TipoDeNavio.PortaAvioes, 0, 0, Direcao.Direita);
-            //tabUser.PosicionarNavio(TipoDeNavio.Encouracado, 0, 1, Direcao.Direita);
-            //tabUser.PosicionarNavio(TipoDeNavio.Cruzador, 0, 2, Direcao.Direita);
-            //tabUser.PosicionarNavio(TipoDeNavio.Destroier, 0, 3, Direcao.Direita);
-            //tabUser.PosicionarNavio(TipoDeNavio.Submarino, 0, 4, Direcao.Direita);
-
-            //IniciarCliente();
         }
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)

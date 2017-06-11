@@ -32,6 +32,9 @@ namespace batalha_naval
             inside = false;
             cell = EMPTY_POINT;
 
+            //Reinicia o cliente
+            IniciarCliente();
+
             boardPlayer.Invalidate();
             boardEnemy.Invalidate();
         }
@@ -86,31 +89,37 @@ namespace batalha_naval
             ResultadoDeTiro resultado = t.Aplicar(tabUser);
             Invoke(new Action(() =>
             {
+                //Atualiza a tela
+                boardPlayer.Invalidate();
+                boardEnemy.Invalidate();
+
+                //Guarda onde recebeu o tiro
                 receivedCell = new System.Drawing.Point(t.X, t.Y);
 
                 ResultadoDeTiro resultadoTotal = usuario.TirosRecebidos.Resultado(t);
 
+                //Se, no resultado obtido no ultimo tiro, contiver a flag "ganhou", significa que o adversário ganhou
                 if (resultadoTotal.HasFlag(ResultadoDeTiro.Ganhou))
                 {
                     usuario.Close();
                     SairJogo();
 
                     IniciarCliente();
+                    MessageBox.Show(this, "Você perdeu o joguinho =(", "Que pena...", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
 
                 if (resultado == ResultadoDeTiro.Errou)
                 {
+                    //Inicia a animação de água no seu tabuleiro
                     player = Animacao.Espirrando;
                     splash.Start();
                 }
                 else
                 {
+                    //Inicia a animação de explosão no seu tabuleiro
                     player = Animacao.Explodindo;
                     explosion.Start();
                 }
-
-                boardPlayer.Invalidate();
-                boardEnemy.Invalidate();
             }));
         }
 
@@ -122,24 +131,35 @@ namespace batalha_naval
                 boardEnemy.Invalidate();
                 boardPlayer.Invalidate();
 
-                //soundPlayer.Play();
-
+                //Se nas flags do resultado tiver a flag "ganhou", significa que você ganhou
                 if (resultado.HasFlag(ResultadoDeTiro.Ganhou))
+                {
                     usuario.Close();
+                    SairJogo();
 
-                if (resultado.HasFlag(ResultadoDeTiro.Afundou))
-                    MessageBox.Show(this, "O " + Enum.GetName(typeof(TipoDeNavio), resultado.TipoDeNavio()) + " inimigo foi afundado");
+                    IniciarCliente();
+                    MessageBox.Show(this, "Você ganhou o joguinho =)", "Parabéns!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
 
                 if (resultado == ResultadoDeTiro.Errou)
                 {
+                    //Inicia a animação e o som de água no tabuleiro inimigo
                     enemy = Animacao.Espirrando;
                     splash.Start();
+
+                    soundPlayerS.Play();
                 }
                 else
                 {
+                    //Inicia a animação e o som de explosão no tabuleiro inimigo
                     enemy = Animacao.Explodindo;
                     explosion.Start();
+
+                    soundPlayerE.Play();
                 }
+
+                if (resultado.HasFlag(ResultadoDeTiro.Afundou))
+                    MessageBox.Show(this, "O " + Enum.GetName(typeof(TipoDeNavio), resultado.TipoDeNavio()) + " inimigo foi afundado");
             }));
         }
 
